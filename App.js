@@ -5,29 +5,50 @@ import URLAfterShort from "./src/components/URLAfterShort";
 import URLInfo from "./src/components/URLInfo";
 
 const App = () => {
-  const [show, setShow] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [submittedValue, setSubmittedValue] = useState("");
+  const [longUrl, setlongUrl] = useState("");
+  const [shortUrl, setShortUrl] = useState("");
+//   const API_URL = "https://url-shortner-backend-kuqbaoak2-apeksha16s-projects.vercel.app/api/shorten";
+const API_URL = "http://localhost:3000/api/shorten";
 
   const handleChange = (e) => {
-    setInputValue(e.target.value);
+    const value = e.target.value;
+    setInputValue(value);
   };
 
-  const updateCounter = () => {
-    if (show === false) {
-      setShow(true);
-      console.log(show);
-    } else {
-      setShow(false);
-      console.log(show);
-    }
+  const callShortenerApi = async (longUrl) => {
+    const body = {
+      originalUrl : longUrl
+    };
+    const apiRes = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body)
+    });
+    const response = await apiRes.json();
+    console.log(response);
+    setShortUrl(response.shortUrl ?? null);
+  }
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(shortUrl);
   };
 
-  
+  const handleOpen = () => {
+    window.open(shortUrl, "_blank");
+  };
+
+  const handleDelete = () => {
+    setShortUrl("");
+    setlongUrl("");
+    setInputValue("");
+  };
 
   const handleButtonClick = () => {
-    setSubmittedValue(inputValue);
-    updateCounter();
+    setlongUrl(inputValue);
+    callShortenerApi(inputValue);
   };
 
   return (
@@ -49,7 +70,7 @@ const App = () => {
             onChange={handleChange}
             placeholder="https://www.example.com/some/very/long/path"
           />
-          <button
+          <button disabled={inputValue.length < 3}
             onClick={() => handleButtonClick()}
             className="text-center cursor-pointer bg-blue-900 p-4 rounded-2xl m-4 text-white font-medium text-lg"
           >
@@ -59,27 +80,27 @@ const App = () => {
       </div>
 
       {/* //URLAfterShort */}
-      {show == true && (
+      {longUrl && shortUrl && (
         <div className="bg-white rounded-4xl flex flex-col m-6 p-7">
           <p className="font-bold text-3xl">Your Shortened URLs</p>
-          <div className="border-2 border-gray-300 rounded-lg p-4 mt-6">
+          <div className="border-2 border-gray-300 rounded-lg p-4 mt-6 w-full break-words">
             <p>Original URL:</p>
-            <p>{submittedValue}</p>
+            <p className="text-sm">{longUrl}</p>
             <p className="mt-4">Short URL:</p>
-            <p className="mb-4">https://www.g.com</p>
+            <p className="mb-4 text-sm">{shortUrl}</p>
             <div className="flex gap-3 mt-4">
               {/* Copy Button */}
-              <button className="cursor-pointer flex items-center gap-2 bg-green-100 hover:bg-green-200 text-green-700 font-medium px-4 py-2 rounded-xl shadow-sm transition">
+              <button onClick={() => handleCopy()} className="cursor-pointer flex items-center gap-2 bg-green-100 hover:bg-green-200 text-green-700 font-medium px-4 py-2 rounded-xl shadow-sm transition">
                 📋 Copy
               </button>
 
               {/* Visit Button */}
-              <button className=" cursor-pointer flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium px-4 py-2 rounded-xl shadow-sm transition">
+              <button onClick={() => handleOpen()} className=" cursor-pointer flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium px-4 py-2 rounded-xl shadow-sm transition">
                 🔗 Visit
               </button>
 
               {/* Delete Button */}
-              <button className=" cursor-pointer flex items-center gap-2 bg-red-100 hover:bg-red-200 text-red-700 font-medium px-4 py-2 rounded-xl shadow-sm transition">
+              <button onClick={() => handleDelete()} className=" cursor-pointer flex items-center gap-2 bg-red-100 hover:bg-red-200 text-red-700 font-medium px-4 py-2 rounded-xl shadow-sm transition">
                 🗑️ Delete
               </button>
             </div>
