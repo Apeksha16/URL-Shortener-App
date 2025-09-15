@@ -8,8 +8,8 @@ const App = () => {
   const [inputValue, setInputValue] = useState("");
   const [longUrl, setlongUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
-//   const API_URL = "https://url-shortner-backend-kuqbaoak2-apeksha16s-projects.vercel.app/api/shorten";
-const API_URL = "http://localhost:3000/api/shorten";
+  const API_URL = "https://url-shortener-backend-9zf6jxsm8-apeksha16s-projects.vercel.app";
+// const API_URL = "http://localhost:3000/api/shorten";
 
   const handleChange = (e) => {
     const value = e.target.value;
